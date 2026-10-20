@@ -6,7 +6,7 @@ const browser=await chromium.launch({channel:'chrome',headless:true,args:['--ena
 const context=await browser.newContext({viewport:{width:1440,height:960},deviceScaleFactor:1,acceptDownloads:true});
 const page=await context.newPage();page.setDefaultTimeout(12000);const errors=[],checks=[],shots=[],stats=[];
 page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>m.type()==='error'&&errors.push(m.text()));
-const shot=async n=>{const p=`artifacts/${prefix}${n}.png`;await page.screenshot({path:p});shots.push(p)};
+const shot=async n=>{const p=`artifacts/${prefix}${n}.png`;await page.waitForTimeout(270);await page.screenshot({path:p});shots.push(p)};
 const state=()=>page.evaluate(()=>window.herbShop.getState());const click=async s=>page.locator(s).click();
 const check=(name,pass)=>{assert.ok(pass,name);checks.push(name);console.log('PASS',name)};
 async function target(action,id){await page.waitForTimeout(70);const p=await page.evaluate(([action,id])=>window.herbShop.project(action,id),[action,id]);assert.ok(p,`target ${action}:${id}`);await page.mouse.click(p.x,p.y);await page.waitForTimeout(80);return p}
